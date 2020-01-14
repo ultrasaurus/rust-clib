@@ -1,4 +1,4 @@
 
 ```
-gcc app.c -o app && ./app
+gcc *.c -o app && ./app
 ```

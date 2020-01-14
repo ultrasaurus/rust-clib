@@ -1,9 +1,5 @@
 #include <stdio.h>
-
-
-int add(int a, int b) {
-  return a + b;
-}
+#include "lib.h"
 
 int main() {
    int a, b, sum;
@@ -15,7 +11,7 @@ int main() {
 
    // sum = a + b;
    sum = add(a,b);
-   
+
    printf("\nTotal : %d\n\n", sum);
 
    return(0);
