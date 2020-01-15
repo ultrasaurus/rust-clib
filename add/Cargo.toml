@@ -4,10 +4,19 @@ version = "0.1.0"
 authors = ["Sarah Allen <sarah@ultrasaurus.com>"]
 edition = "2018"
 
+# Note: header file generation happens in build.rs
 [lib]
 name = "add"
-crate-type = ["staticlib"] # Creates static lib
+crate-type = ["staticlib"]    
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+
+## see more info at: https://svartalf.info/posts/2019-03-01-exposing-ffi-from-the-rust-library/
+cbindgen = "0.8.0"
+
+
 
 [dependencies]
+
+

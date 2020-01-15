@@ -10,15 +10,12 @@ successful output looks like this:
 ```
 /Users/sallen/src/ctest/add
     Finished dev [unoptimized + debuginfo] target(s) in 0.00s
-Saving session...
-...copying shared history...
-...saving history...truncating history files...
-...completed.
-Deleting expired sessions...149 completed.
 newair:ctest sallen$ gcc main.c add/target/debug/libadd.a -o app && ./app
 PASSED
 Tests run: 1
 ```
+
+
 
 ## Other tests (unused in pure Rust lib)
 Compile and run the C main with library in C code 
@@ -42,7 +39,6 @@ cd add
 cargo test                  # test that we can call the function in Rust
 cargo run --example stdin   # interactive example
 ```
-
 
 ## references that might be helpful
 

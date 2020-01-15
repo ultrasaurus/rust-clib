@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "lib.h"
+#include "add/add.h"
 
 int tests_run = 0;
 
