@@ -28,6 +28,7 @@ gcc *.c -o app && ./app
 ## Docs I found helpful
 
 * Rust Embedded book: [A little Rust with your C](https://rust-embedded.github.io/book/interoperability/rust-with-c.html)
+* https://svartalf.info/posts/2019-03-01-exposing-ffi-from-the-rust-library/
 * Cargo book: [build scripts](https://doc.rust-lang.org/cargo/reference/build-scripts.html)
 
 ## The Rust part
