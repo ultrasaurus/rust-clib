@@ -5,18 +5,15 @@ Compile and run the C main with test (no rust for now)
 gcc *.c -o app && ./app
 ```
 
-Run pure Rust example
+
+## The Rust part
+
+in the `add` directory is a Rust crate
+
 ```
 cd add
-cargo run --example stdin
-```
-
-
-## How I made this:
-
-```
-cargo new add --lib
-...
+cargo test                  # test that we can call the function in Rust
+cargo run --example stdin   # interactive example
 ```
 
 
