@@ -8,7 +8,6 @@ int tests_run = 0;
 #define _assert(expr, val) do { if ((expr) != (val)) { FAIL(expr, val); return 1; } } while(0)
 #define _verify(test) do { int r=test(); tests_run++; if(r) return r; } while(0)
 
-
 int add_01() {
     _assert(add(1,2), 3);
     return 0;

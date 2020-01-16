@@ -1,4 +1,4 @@
-
+## rust-clib 
 
 Build rust lib and run tests from C code
 ```
@@ -15,14 +15,6 @@ PASSED
 Tests run: 1
 ```
 
-
-
-## Other tests (unused in pure Rust lib)
-Compile and run the C main with library in C code 
-```
-## need to un-comment lib.c to make this work
-gcc *.c -o app && ./app
-```
 
 
 ## Docs I found helpful
