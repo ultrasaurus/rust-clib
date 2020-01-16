@@ -25,9 +25,14 @@ Tests run: 2
 in the `add` directory is a Rust crate
 
 ```
-cargo test                  # test that we can call the function in Rust
-cargo run --example stdin   # interactive example doesn't compile right now
+cargo test cargo test --lib   # test that our library works in Rust
 ```
+
+interactive example doesn't compile right now ([issue#1](https://github.com/ultrasaurus/rust-clib/issues/1))
+```
+cargo run --example stdin
+```
+
 
 ## furhter references that might be helpful
 
