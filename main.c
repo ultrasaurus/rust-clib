@@ -8,13 +8,19 @@ int tests_run = 0;
 #define _assert(expr, val) do { if ((expr) != (val)) { FAIL(expr, val); return 1; } } while(0)
 #define _verify(test) do { int r=test(); tests_run++; if(r) return r; } while(0)
 
-int add_01() {
+int add_positive_numbers() {
     _assert(add(1,2), 3);
     return 0;
 }
 
+int add_negative_numbers() {
+    _assert(add(-1,-2), -3);
+    return 0;
+}
+
 int all_tests() {
-    _verify(add_01);
+    _verify(add_positive_numbers);
+    _verify(add_negative_numbers);
     return 0;
 }
 

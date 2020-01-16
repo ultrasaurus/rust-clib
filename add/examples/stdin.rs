@@ -2,7 +2,7 @@ use add::add;
 use std::io;
 use std::io::Write; 
 
-fn get_u32() -> u32 {
+fn get_i32() -> i32 {
   let mut input = String::new();
   print!("\nEnter a number: ");
   io::stdout().flush().expect("could not write to stdout");
@@ -13,8 +13,8 @@ fn get_u32() -> u32 {
 
 
 fn main() {
-  let a = get_u32();
-  let b = get_u32();
+  let a = get_i32();
+  let b = get_i32();
   let sum = add(a,b);
   
   println!("\nTotal : {}\n\n", sum);

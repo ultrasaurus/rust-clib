@@ -11,9 +11,7 @@ crate-type = ["staticlib"]
 
 
 [build-dependencies]
-
-## see more info at: https://svartalf.info/posts/2019-03-01-exposing-ffi-from-the-rust-library/
-cbindgen = "0.8.0"
+cbindgen = "0.12"
 
 
 
