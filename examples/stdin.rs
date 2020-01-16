@@ -15,7 +15,7 @@ fn get_i32() -> i32 {
 fn main() {
   let a = get_i32();
   let b = get_i32();
-  let sum = add(a,b);
+  let sum = add::add(a,b);
   
   println!("\nTotal : {}\n\n", sum);
 
