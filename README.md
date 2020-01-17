@@ -34,7 +34,7 @@ cargo run --example stdin
 ```
 
 
-## furhter references that might be helpful
+## further references that might be helpful
 
 * https://svartalf.info/posts/2019-03-01-exposing-ffi-from-the-rust-library/
 * https://doc.rust-lang.org/nomicon/ffi.html
