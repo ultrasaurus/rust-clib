@@ -8,11 +8,14 @@ gcc main.c add/target/debug/libadd.a -o app && ./app
 
 successful output looks like this:
 ```
-/Users/sallen/src/ctest/add
-    Finished dev [unoptimized + debuginfo] target(s) in 0.00s
-newair:ctest sallen$ gcc main.c add/target/debug/libadd.a -o app && ./app
+   Compiling add v0.1.0 (~/src/rust/clib/add)
+    Finished dev [unoptimized + debuginfo] target(s) in 4.21s
+Saving session...
+...saving history...truncating history files...
+...completed.
+$ gcc main.c add/target/debug/libadd.a -o app && ./app
 PASSED
-Tests run: 1
+Tests run: 2
 ```
 
 
