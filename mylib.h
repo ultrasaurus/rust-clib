@@ -7,8 +7,6 @@
 
 #include <stdint.h>
 
-typedef struct my_status_callback_t my_status_callback_t;
-
 typedef struct my_thing_t my_thing_t;
 
 typedef void (*my_status_callback_t)(int32_t code, void *user_data);
@@ -20,7 +18,5 @@ my_thing_t *create_thing(int32_t num, my_status_callback_t callback_or_null, voi
 void destroy_thing(my_thing_t *thing_ptr);
 
 int32_t thing_num(my_thing_t *thing_ptr);
-
-void thing_something(my_thing_t *thing_ptr);
 
 #endif /* mylib_h */

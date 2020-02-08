@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "mylib/mylib.h"
+#include "mylib.h"
 
 int tests_run = 0;
 
@@ -19,18 +19,40 @@ int add_negative_numbers() {
 }
 
 int test_create_thing() {
-  my_thing_t* thing = create_thing(1);
+  my_thing_t* thing = create_thing(1, NULL, NULL);
   int32_t num = thing_num(thing);
   _assert(num, 1);
   destroy_thing(thing);
   return 0;
 }
 
+int called = 0;
+typedef struct {
+  int counter;
+} MyData;
+
+void status_callback(int32_t code, void *user_data) {
+  called = 1;
+  MyData* my_data = (MyData*)user_data;
+  my_data->counter++;
+}
+
+int test_thing_callback() {
+  MyData data = {0}; 
+  my_thing_t* thing = create_thing(1, status_callback, &data);
+  thing_something(thing);
+  _assert(data.counter, 1);
+  destroy_thing(thing);
+  return 0;
+}
+
+
 // would be good to test memory leaks
 int all_tests() {
     _verify(add_positive_numbers);
     _verify(add_negative_numbers);
     _verify(test_create_thing);
+    _verify(test_thing_callback);
     return 0;
 }
 
