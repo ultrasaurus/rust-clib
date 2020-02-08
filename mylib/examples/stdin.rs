@@ -1,4 +1,4 @@
-use add::add;
+use mylib::add;
 use std::io;
 use std::io::Write; 
 
