@@ -18,9 +18,19 @@ int add_negative_numbers() {
     return 0;
 }
 
+int test_create_thing() {
+  my_thing_t* thing = create_thing(1);
+  int32_t num = thing_num(thing);
+  _assert(num, 1);
+  destroy_thing(thing);
+  return 0;
+}
+
+// would be good to test memory leaks
 int all_tests() {
     _verify(add_positive_numbers);
     _verify(add_negative_numbers);
+    _verify(test_create_thing);
     return 0;
 }
 
