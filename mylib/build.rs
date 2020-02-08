@@ -23,5 +23,5 @@ fn main() {
 
     cbindgen::generate_with_config(&crate_dir, config)
         .unwrap()
-        .write_to_file(crate_dir.join("add.h"));
+        .write_to_file(crate_dir.join("mylib.h"));
 }

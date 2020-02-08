@@ -1,12 +1,12 @@
 [package]
-name = "add"
+name = "mylib"
 version = "0.1.0"
 authors = ["Sarah Allen <sarah@ultrasaurus.com>"]
 edition = "2018"
 
 # Note: header file generation happens in build.rs
 [lib]
-name = "add"
+name = "mylib"
 crate-type = ["staticlib"]    
 
 

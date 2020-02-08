@@ -2,8 +2,8 @@
 
 Build rust lib and run tests from C code
 ```
-(cd add && cargo build)
-gcc main.c add/target/debug/libadd.a -o app && ./app
+(cd mylib && cargo build)
+gcc main.c mylib/target/debug/libmylib.a -o app && ./app
 ```
 
 successful output looks like this:
