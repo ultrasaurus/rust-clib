@@ -1,19 +1,18 @@
 ## rust-clib 
 
-Build rust lib and run tests from C code
+Build rust lib and run C tests
 ```
 (cd mylib && cargo build)
-gcc main.c mylib/target/debug/libmylib.a -o app && ./app
+make test
 ```
 
 successful output looks like this:
 ```
-   Compiling add v0.1.0 (~/src/rust/clib/add)
+   Compiling add v0.1.0 (~/src/rust/clib/mylib)
     Finished dev [unoptimized + debuginfo] target(s) in 4.21s
-Saving session...
-...saving history...truncating history files...
-...completed.
-$ gcc main.c add/target/debug/libadd.a -o app && ./app
+cp mylib/target/debug/libmylib.a .
+gcc  libmylib.a -o test test.o libmylib.a 
+./test
 PASSED
 Tests run: 2
 ```

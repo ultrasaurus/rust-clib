@@ -1,2 +1,5 @@
 app
 target/
+libmylib.a
+*.o
+test
