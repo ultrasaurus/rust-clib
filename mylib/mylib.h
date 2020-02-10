@@ -7,8 +7,6 @@
 
 #include <stdint.h>
 
-typedef struct my_status_callback_t my_status_callback_t;
-
 typedef struct my_thing_t my_thing_t;
 
 typedef void (*my_status_callback_t)(int32_t code, void *user_data);

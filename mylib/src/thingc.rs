@@ -2,7 +2,7 @@ use std::ffi::c_void;
 use crate::{StatusCallback, Thing, ThingStatus};
 
 pub struct ExtThingStatus {
-  callback: status_callback_t,
+  callback: StatusCallbackFunction,
   userdata: * mut c_void,
 }
 
@@ -11,20 +11,22 @@ impl StatusCallback for ExtThingStatus {
     (self.callback)(status.code, self.userdata);
   }
 }
-pub type status_callback_t = extern "C" fn(code: i32, user_data: * mut c_void) -> ();
+// pub type status_callback_t = extern "C" fn(code: i32, user_data: * mut c_void) -> ();
 
 pub type StatusCallbackFunction = extern "C" fn(code: i32, user_data: * mut c_void) -> ();
 
 #[no_mangle]
-pub extern "C" fn create_thing(num: i32, callback_or_null: Option<StatusCallbackFunction>, userdata: * mut c_void) -> * mut Thing<ExtThingStatus> {
+pub extern "C" fn create_thing(num: i32, callback_or_null: StatusCallbackFunction, userdata: * mut c_void) -> * mut Thing<ExtThingStatus> {
   let mut callback_info = None;
-  if let Some(callback) = callback_or_null {
+  if !(callback_or_null as *mut c_void).is_null() {
+    let callback = callback_or_null;
     callback_info = Some(ExtThingStatus {
       callback,
       userdata
     });
   }
-    Box::into_raw(Box::new(Thing::new(num, callback_info)))
+
+  Box::into_raw(Box::new(Thing::new(num, callback_info)))
 }
 
 #[no_mangle]

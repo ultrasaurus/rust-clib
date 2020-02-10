@@ -8,10 +8,8 @@ no_includes = true
 
 
 [export]
-include = ["status_callback_t"]
-exclude = ["StatusCallbackFunction"]
 prefix = "my_"
 
 [export.rename]
 "Thing_ExtThingStatus" = "thing_t"
-"Option_StatusCallbackFunction" = "status_callback_t"
+"StatusCallbackFunction" = "status_callback_t"
