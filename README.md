@@ -43,3 +43,10 @@ cargo run --example stdin   # interactive example
 * https://www.joshmatthews.net/blog/2015/10/creating-a-c-api-for-a-rust-library/
 * https://www.reddit.com/r/rust/comments/6u7y3q/rust_wrappers_and_c_callbacks/
 * https://users.rust-lang.org/t/stubbing-extern-c-functions-for-tests/15976/2
+
+
+## Changelog
+
+- v0.1: exporting a Rust function that can be called from C, generating C header ([blog post](https://www.ultrasaurus.com/2020/01/writing-c-library-in-rust/))
+- v0.2: export struct, functions that create/destroy, call functions that
+        accept struct with C callback function
