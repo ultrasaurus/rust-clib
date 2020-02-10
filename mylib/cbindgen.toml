@@ -7,9 +7,7 @@ no_includes = true
 
 
 
-[export]
-prefix = "my_"
 
 [export.rename]
-"Thing_ExtThingStatus" = "thing_t"
-"StatusCallbackFunction" = "status_callback_t"
+"Thing_ExtThingStatus" = "my_thing_t"
+"StatusCallbackFunction" = "my_status_callback_t"

@@ -26,19 +26,17 @@ int test_create_thing() {
   return 0;
 }
 
-int called = 0;
 typedef struct {
   int counter;
-} MyData;
+} TestThingStatusData;
 
 void status_callback(int32_t code, void *user_data) {
-  called = 1;
-  MyData* my_data = (MyData*)user_data;
+  TestThingStatusData* my_data = (TestThingStatusData*)user_data;
   my_data->counter++;
 }
 
 int test_thing_callback() {
-  MyData data = {0}; 
+  TestThingStatusData data = {0}; 
   my_thing_t* thing = create_thing(1, status_callback, &data);
   thing_something(thing);
   _assert(data.counter, 1);
@@ -46,6 +44,21 @@ int test_thing_callback() {
   return 0;
 }
 
+typedef struct {
+  int counter;
+} TestTcpStatusData;
+
+void tcp_status_callback(int32_t code, void *user_data) {
+  TestTcpStatusData* my_data = (TestTcpStatusData*)user_data;
+  my_data->counter++;
+}
+
+int test_tcp_create_destroy() {
+  TestTcpStatusData data = {0};
+  TcpConnection* tcp = create_tcp(status_callback, &data);
+  destroy_tcp(tcp);
+  return 0;
+}
 
 // would be good to test memory leaks
 int all_tests() {
@@ -53,6 +66,7 @@ int all_tests() {
     _verify(add_negative_numbers);
     _verify(test_create_thing);
     _verify(test_thing_callback);
+    _verify(test_tcp_create_destroy);
     return 0;
 }
 
