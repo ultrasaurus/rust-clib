@@ -1,5 +1,7 @@
 ## rust-clib 
 
+An example project that uses Rust to create a library with C API.
+
 Build rust lib and run C tests
 ```
 (cd mylib && cargo build)
@@ -8,13 +10,13 @@ make test
 
 successful output looks like this:
 ```
-   Compiling add v0.1.0 (~/src/rust/clib/mylib)
+   Compiling add v0.2.0 (~/src/rust/clib/mylib)
     Finished dev [unoptimized + debuginfo] target(s) in 4.21s
 cp mylib/target/debug/libmylib.a .
 gcc  libmylib.a -o test test.o libmylib.a 
 ./test
 PASSED
-Tests run: 2
+Tests run: 4
 ```
 
 
@@ -27,10 +29,11 @@ Tests run: 2
 
 ## The Rust part
 
-in the `add` directory is a Rust crate
+in the `my` directory is a Rust crate, which has tests along with a very
+simple example that calls a function from Rust (that is also callable from C)
 
 ```
-cd add
+cd mylib
 cargo test                  # test that we can call the function in Rust
 cargo run --example stdin   # interactive example
 ```
