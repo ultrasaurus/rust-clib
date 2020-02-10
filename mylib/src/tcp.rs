@@ -7,19 +7,29 @@ pub struct TcpConnection {
   runtime: Runtime,
   conn: Option<TcpStream>,
   callback: TcpStatusCallback,
-  user_data: * mut c_void,
+  user_data: UserData,
 }
 
-pub type TcpStatusCallback = extern "C" fn(code: i32, user_data: * mut c_void) -> ();
+ pub struct UserData {
+   data: * const c_void,
+ }
+ // this might be a bad idea, but I don't know any other option
+ // except to trust the caller to put locks around any mutation to this data
+ unsafe impl Send for UserData {}
+
+
+pub type TcpStatusCallback = extern "C" fn(code: i32, user_data: UserData) -> * mut c_void;
 
 impl TcpConnection {
-  pub fn trigger_callback(&self, code: i32) {
-    (self.callback)(code, self.user_data);
+  pub fn trigger_callback(&mut self, code: i32) {
+    let data = UserData { data: std::ptr::null() };
+    (self.callback)(code, data);
+    // want to pass self.user_data, but need to lock it
   }
 }
 
 #[no_mangle]
-pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: * mut c_void) -> * mut TcpConnection {
+pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: UserData) -> * mut TcpConnection {
   assert!(!(callback as *mut c_void).is_null());
   let runtime = Runtime::new().unwrap();
 
@@ -33,17 +43,37 @@ pub unsafe extern "C" fn tcp_connect_blocking(tcp_ptr: *mut TcpConnection) -> ()
   }
   let tcp = &mut *tcp_ptr;
 
-  let mut code = -1;
+  let code = -1;
   let conn = TcpStream::connect("127.0.0.1:80");
 
   tcp.runtime.block_on(async {
     let result = conn.await;
-    code = match result {
+    let code = match result {
       Ok(_) => 200,
       Err(_) => 404,
     };
-  });
+  }); 
   tcp.trigger_callback(code);
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
+  if tcp_ptr.is_null() {
+    return;   // should be an error, but just experimenting here
+  }
+  let tcp = &mut *tcp_ptr;
+
+  let conn = TcpStream::connect("127.0.0.1:80");
+
+  let handle = tcp.runtime.spawn(async {
+    let result = conn.await;
+    let code = match result {
+      Ok(_) => 200,
+      Err(_) => 404,
+    };
+    tcp.trigger_callback(code);
+  });
 
 }
 

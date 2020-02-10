@@ -48,12 +48,13 @@ typedef struct {
   int counter;
 } TestTcpStatusData;
 
-void tcp_status_callback(int32_t code, void *user_data) {
+void * tcp_status_callback(int32_t code, void *user_data) {
   TestTcpStatusData* my_data = (TestTcpStatusData*)user_data;
   my_data->counter++;
+  return user_data;
 }
 
-int test_tcp_create_destroy() {
+int test_tcp_create_connect_blocking() {
   TestTcpStatusData data = {0};
   TcpConnection* tcp = create_tcp(status_callback, &data);
   tcp_connect_blocking(tcp);
@@ -68,7 +69,7 @@ int all_tests() {
     _verify(add_negative_numbers);
     _verify(test_create_thing);
     _verify(test_thing_callback);
-    _verify(test_tcp_create_destroy);
+    _verify(test_tcp_create_connect_blocking);
     return 0;
 }
 
