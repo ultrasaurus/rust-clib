@@ -56,6 +56,8 @@ void tcp_status_callback(int32_t code, void *user_data) {
 int test_tcp_create_destroy() {
   TestTcpStatusData data = {0};
   TcpConnection* tcp = create_tcp(status_callback, &data);
+  tcp_connect_blocking(tcp);
+  _assert(data.counter, 1);
   destroy_tcp(tcp);
   return 0;
 }
