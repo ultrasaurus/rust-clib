@@ -4,11 +4,12 @@ use std::ptr::NonNull;
 use tokio::runtime::Runtime;
 use tokio::net::TcpStream;
 use std::time::Duration;
+use tokio::task;
 
 pub struct TcpConnection {
   runtime: Runtime,
   conn: Option<TcpStream>,
-  cb: Arc<CallbackInfo>,
+  cb: CallbackInfo,
 }
 
 pub type TcpStatusCallback = extern "C" fn(code: i32) -> * mut c_void;
@@ -19,7 +20,7 @@ pub struct CallbackInfo {
 }
 // this might be a bad idea, but I don't know any other option
 // except to trust the caller to put locks around any mutation to this data
-unsafe impl Send for CallbackInfo {}
+// unsafe impl Send for CallbackInfo {}
 
 impl CallbackInfo {
   pub fn call(&self, code: i32) {
@@ -33,7 +34,7 @@ pub extern "C" fn create_tcp(callback: TcpStatusCallback) -> * mut TcpConnection
   where TcpStatusCallback : 'static
 {
   let runtime = Runtime::new().unwrap();
-  let cb = Arc::new(CallbackInfo { callback });
+  let cb = CallbackInfo { callback };
   Box::into_raw(Box::new(TcpConnection { runtime, conn: None, cb }))
 }
 
@@ -44,8 +45,8 @@ pub unsafe extern "C" fn tcp_connect_blocking(tcp_ptr: *mut TcpConnection) -> ()
   }
   let tcp = &mut *tcp_ptr;
 
-  let code = -1;
   let conn = TcpStream::connect("127.0.0.1:80");
+  let cb = tcp.cb;
 
   tcp.runtime.block_on(async {
     let result = conn.await;
@@ -53,23 +54,21 @@ pub unsafe extern "C" fn tcp_connect_blocking(tcp_ptr: *mut TcpConnection) -> ()
       Ok(_) => 200,
       Err(_) => 404,
     };
+    cb.call(code);
   }); 
-  //tcp.trigger_callback(code);
 }
 
 
 #[no_mangle]
 pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
   if tcp_ptr.is_null() {
-    return;   // should be an error, but just experimenting here
+    return ()
   }
   let tcp = &mut *tcp_ptr;
-
   let conn = TcpStream::connect("127.0.0.1:80");
+  let cb = tcp.cb;
 
-  let cb = Arc::clone(&tcp.cb);
-
-   let handle = tcp.runtime.spawn(async move {
+  tcp.runtime.spawn(async move {
 
     let result = conn.await;
     let code = match result {
@@ -78,7 +77,6 @@ pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
     };
     cb.call(code);
   });
-
 }
 
 
