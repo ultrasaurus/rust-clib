@@ -8,33 +8,34 @@ use std::time::Duration;
 pub struct TcpConnection {
   runtime: Runtime,
   conn: Option<TcpStream>,
-  cb: CallbackInfo,
+  cb: Arc<CallbackInfo>,
 }
 
 
-pub type TcpStatusCallback = extern "C" fn(code: i32, user_data: * const c_void) -> * mut c_void;
+pub type TcpStatusCallback = extern "C" fn(code: i32) -> * mut c_void;
 
 #[derive(Copy, Clone)]
 pub struct CallbackInfo {
   callback: TcpStatusCallback,
-  user_data: * const c_void,
 }
 // this might be a bad idea, but I don't know any other option
 // except to trust the caller to put locks around any mutation to this data
 unsafe impl Send for CallbackInfo {}
 
+impl CallbackInfo {
+  pub fn call(&self, code: i32) {
+    (self.callback)(code);
+  }
+}
+
+
 #[no_mangle]
-pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: * const c_void) -> * mut TcpConnection 
+pub extern "C" fn create_tcp(callback: TcpStatusCallback) -> * mut TcpConnection 
   where TcpStatusCallback : 'static
 {
-  assert!(!(callback as *mut c_void).is_null());
   let runtime = Runtime::new().unwrap();
-
-  Box::into_raw(Box::new(TcpConnection { runtime, conn: None, 
-                                          callback, 
-                                          cb: CallbackInfo { 
-                                            callback,
-                                            user_data } }))
+  let cb = Arc::new(CallbackInfo { callback });
+  Box::into_raw(Box::new(TcpConnection { runtime, conn: None, cb }))
 }
 
 #[no_mangle]
@@ -67,18 +68,17 @@ pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
 
   let conn = TcpStream::connect("127.0.0.1:80");
 
-  let cb_info = tcp.cb;
-
-  // 71 |   let handle = tcp.runtime.spawn(async {
-  //    |                            ^^^^^ `*const std::ffi::c_void` cannot be shared between threads safely
+  let cb = &tcp.cb;
  
   let handle = tcp.runtime.spawn(async {
+    let clone_cb = Arc::clone(&cb);
+
     let result = conn.await;
     let code = match result {
       Ok(_) => 200,
       Err(_) => 404,
     };
-    (cb_info.callback)(code, std::ptr::null() );
+    clone_cb.call(code);
   });
 
 }
