@@ -1,6 +1,4 @@
-use std::sync::Arc;
 use std::ffi::c_void;
-use std::ptr::NonNull;
 use tokio::runtime::Runtime;
 use tokio::net::TcpStream;
 use std::time::Duration;
@@ -8,6 +6,7 @@ use tokio::task;
 
 pub struct TcpConnection {
   runtime: Runtime,
+  handle: Option<task::JoinHandle<()>>,
   conn: Option<TcpStream>,
   cb: CallbackInfo,
 }
@@ -36,7 +35,9 @@ pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: * const c_v
 {
   let runtime = Runtime::new().unwrap();
   let cb = CallbackInfo { callback, user_data };
-  Box::into_raw(Box::new(TcpConnection { runtime, conn: None, cb }))
+  Box::into_raw(Box::new(TcpConnection { runtime,
+                                         handle: None,
+                                         conn: None, cb }))
 }
 
 #[no_mangle]
@@ -69,15 +70,19 @@ pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
   let conn = TcpStream::connect("127.0.0.1:80");
   let cb = tcp.cb;
 
-  tcp.runtime.spawn(async move {
+  let handle = tcp.runtime.spawn(async move {
 
     let result = conn.await;
     let code = match result {
-      Ok(_) => 200,
+      Ok(_cn) => {
+        // tcp.conn = Some(cn);
+        200
+      },
       Err(_) => 404,
     };
     cb.call(code);
   });
+  tcp.handle = Some(handle);
 }
 
 pub unsafe extern "C" fn tcp_connect_wait(tcp_ptr: *mut TcpConnection) -> () {
@@ -85,7 +90,9 @@ pub unsafe extern "C" fn tcp_connect_wait(tcp_ptr: *mut TcpConnection) -> () {
     return ()
   }
   let tcp = &mut *tcp_ptr;
-
+  if let Some(h) = tcp.handle {
+    tcp.runtime.block_on(h);
+  }
 }
 
 
