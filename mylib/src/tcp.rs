@@ -8,27 +8,20 @@ use std::time::Duration;
 pub struct TcpConnection {
   runtime: Runtime,
   conn: Option<TcpStream>,
-  callback: TcpStatusCallback,
-  cbdata: CallbackData,
+  cb: CallbackInfo,
 }
-
-pub struct CallbackData {
-  data: * const c_void,
-}
-// this might be a bad idea, but I don't know any other option
-// except to trust the caller to put locks around any mutation to this data
-unsafe impl Send for CallbackData {}
 
 
 pub type TcpStatusCallback = extern "C" fn(code: i32, user_data: * const c_void) -> * mut c_void;
 
-// impl TcpConnection {
-//   pub fn trigger_callback(&mut self, code: i32) {
-//     let data = CallbackData { data: std::ptr::null() };
-//     (self.callback)(code, data);
-//     // want to pass self.user_data, but need to lock it
-//   }
-// }
+#[derive(Copy, Clone)]
+pub struct CallbackInfo {
+  callback: TcpStatusCallback,
+  user_data: * const c_void,
+}
+// this might be a bad idea, but I don't know any other option
+// except to trust the caller to put locks around any mutation to this data
+unsafe impl Send for CallbackInfo {}
 
 #[no_mangle]
 pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: * const c_void) -> * mut TcpConnection 
@@ -39,7 +32,9 @@ pub extern "C" fn create_tcp(callback: TcpStatusCallback, user_data: * const c_v
 
   Box::into_raw(Box::new(TcpConnection { runtime, conn: None, 
                                           callback, 
-                                          cbdata: CallbackData { data: user_data } }))
+                                          cb: CallbackInfo { 
+                                            callback,
+                                            user_data } }))
 }
 
 #[no_mangle]
@@ -72,14 +67,18 @@ pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
 
   let conn = TcpStream::connect("127.0.0.1:80");
 
-  let callback = &tcp.callback;
+  let cb_info = tcp.cb;
+
+  // 71 |   let handle = tcp.runtime.spawn(async {
+  //    |                            ^^^^^ `*const std::ffi::c_void` cannot be shared between threads safely
+ 
   let handle = tcp.runtime.spawn(async {
     let result = conn.await;
     let code = match result {
       Ok(_) => 200,
       Err(_) => 404,
     };
-    callback(code, std::ptr::null() );
+    (cb_info.callback)(code, std::ptr::null() );
   });
 
 }
