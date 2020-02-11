@@ -63,6 +63,16 @@ int test_tcp_create_connect_blocking() {
   return 0;
 }
 
+int test_tcp_create_connect_async() {
+  TestTcpStatusData data = {0};
+  TcpConnection* tcp = create_tcp(status_callback, &data);
+  tcp_connect_async(tcp);
+  _assert(data.counter, 1);
+  destroy_tcp(tcp);
+  return 0;
+}
+
+
 // would be good to test memory leaks
 int all_tests() {
     _verify(add_positive_numbers);
@@ -70,6 +80,7 @@ int all_tests() {
     _verify(test_create_thing);
     _verify(test_thing_callback);
     _verify(test_tcp_create_connect_blocking);
+    _verify(test_tcp_create_connect_async);
     return 0;
 }
 
