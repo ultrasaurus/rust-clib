@@ -90,8 +90,12 @@ pub unsafe extern "C" fn tcp_connect_wait(tcp_ptr: *mut TcpConnection) -> () {
     return ()
   }
   let tcp = &mut *tcp_ptr;
-  if let Some(h) = tcp.handle {
-    tcp.runtime.block_on(h);
+
+  if let Some(mut h) = &tcp.handle {
+    tcp.runtime.block_on(async {
+      h.await
+    });
+
   }
 }
 
