@@ -11,7 +11,6 @@ pub struct TcpConnection {
   cb: Arc<CallbackInfo>,
 }
 
-
 pub type TcpStatusCallback = extern "C" fn(code: i32) -> * mut c_void;
 
 #[derive(Copy, Clone)]
@@ -68,17 +67,16 @@ pub unsafe extern "C" fn tcp_connect_async(tcp_ptr: *mut TcpConnection) -> () {
 
   let conn = TcpStream::connect("127.0.0.1:80");
 
-  let cb = &tcp.cb;
- 
-  let handle = tcp.runtime.spawn(async {
-    let clone_cb = Arc::clone(&cb);
+  let cb = Arc::clone(&tcp.cb);
+
+   let handle = tcp.runtime.spawn(async move {
 
     let result = conn.await;
     let code = match result {
       Ok(_) => 200,
       Err(_) => 404,
     };
-    clone_cb.call(code);
+    cb.call(code);
   });
 
 }
